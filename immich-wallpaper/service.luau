@@ -31,6 +31,7 @@ local ERROR_NOTIFY_SECONDS = 60 * 60
 local INDEX_FILE = "photos.json"
 local MAX_MEMORY_BYTES = 512 * 1024
 local RETRY_SECONDS = 60 * 60 -- re-fetch photos that came back at preview size
+local EDIT_CHECK_SECONDS = 6 * 60 * 60 -- re-check saved photos for Immich edits
 
 -- Targets, rebuilt from settings on every reset:
 --   { folder, albums = {entries}, people = {...}, tags = {...},
@@ -222,9 +223,14 @@ local function formatPhotoDate(iso)
   return `{d}/{m}/{y}`
 end
 
--- The original's display size (EXIF orientations 5-8 rotate by 90°;
--- previews are already upright), or nil when Immich doesn't know it.
+-- The display size (EXIF orientations 5-8 rotate by 90°; previews are
+-- already upright), or nil when Immich doesn't know it. An edited asset's
+-- width/height are those of the edited, upright image, while EXIF keeps the
+-- original's.
 local function orientedSize(asset)
+  if asset.isEdited and tonumber(asset.width) and tonumber(asset.height) then
+    return tonumber(asset.width), tonumber(asset.height)
+  end
   local exif = asset.exifInfo or {}
   local w = tonumber(exif.exifImageWidth) or tonumber(asset.width)
   local h = tonumber(exif.exifImageHeight) or tonumber(asset.height)
@@ -278,6 +284,8 @@ local function assetInfo(asset)
     w = (orientedSize(asset)),
     h = select(2, orientedSize(asset)),
     bytes = tonumber(exif.fileSizeInByte) or 0,
+    edited = asset.isEdited == true,
+    updatedAt = type(asset.updatedAt) == "string" and asset.updatedAt or nil,
   }
 end
 
@@ -888,8 +896,14 @@ local DISPLAYABLE_ORIGINALS = {
 }
 local MAX_ORIGINAL_BYTES = 50 * 1024 * 1024
 
+-- edited=true returns Immich's edited (cropped, rotated, mirrored) rendition
+-- when there is one, and is ignored otherwise.
 local function mediaPath(info)
   local size = cfg("image_size", "preview")
+  if size == "original" and info.edited then
+    -- The edited rendition is a JPEG whatever the original's format.
+    return `/assets/{info.id}/original?edited=true`, true
+  end
   if size == "original" then
     local mime = info.mime or ""
     local heif = mime == "image/heic" or mime == "image/heif" or mime == "image/avif"
@@ -898,14 +912,14 @@ local function mediaPath(info)
       and (info.bytes or 0) <= MAX_ORIGINAL_BYTES
       and (not heif or cfg("heif_originals", false))
     then
-      return `/assets/{info.id}/original`, true
+      return `/assets/{info.id}/original?edited=true`, true
     end
     size = "fullsize"
   end
   if size ~= "fullsize" then
-    return `/assets/{info.id}/thumbnail?size=preview`, false
+    return `/assets/{info.id}/thumbnail?size=preview&edited=true`, false
   end
-  return `/assets/{info.id}/thumbnail?size=fullsize`, true
+  return `/assets/{info.id}/thumbnail?size=fullsize&edited=true`, true
 end
 
 -- Pixel size from the image header (JPEG, PNG, WebP), or nil. Reads only
@@ -1077,6 +1091,7 @@ local function download(t, info, replace)
     record.selection = t.selection
     record.lowRes = wantFull and isLowRes(info, res.body, ext) or nil
     record.retryAt = record.lowRes and (os.time() + RETRY_SECONDS) or nil
+    record.checkedAt = os.time()
 
     if replace ~= nil then
       if replace.path ~= path then
@@ -1245,6 +1260,44 @@ local function retryLowRes(now)
   return false
 end
 
+-- Re-download saved photos that were edited (or un-edited) in Immich since
+-- they were saved, one at a time, skipping whatever is on screen. Each photo
+-- is checked every EDIT_CHECK_SECONDS. Returns true if it started a request.
+local function recheckEdits(now)
+  local used = nil
+  for _, t in ipairs(targets) do
+    for _, entry in ipairs(t.owned) do
+      local rec = photos[entry.path]
+      if rec ~= nil and now - (rec.checkedAt or 0) >= EDIT_CHECK_SECONDS then
+        used = used or inUse()
+        if not used[entry.path] then
+          rec.checkedAt = now -- set first, so failures don't loop
+          busySince = now
+          api("GET", `/assets/{entry.id}`, nil, MAX_MEMORY_BYTES, function(asset, err)
+            if asset == nil or not acceptAsset(asset) then
+              busySince = 0
+              saveIndex()
+              noctalia.log(`Immich Wallpaper: could not check {entry.id} for edits: {err or "not an image"}`)
+              return
+            end
+            local info = assetInfo(asset)
+            if info.edited ~= (rec.edited == true) or (info.edited and info.updatedAt ~= rec.updatedAt) then
+              noctalia.log(`Immich Wallpaper: {entry.id} was {info.edited and "edited" or "un-edited"} in Immich; re-fetching`)
+              download(t, info, entry)
+              return
+            end
+            busySince = 0
+            rec.updatedAt = info.updatedAt
+            saveIndex()
+          end)
+          return true
+        end
+      end
+    end
+  end
+  return false
+end
+
 -- ---------------------------------------------------------------------------
 -- Main loop
 
@@ -1288,7 +1341,9 @@ function update()
     end
   end
 
-  retryLowRes(now)
+  if not retryLowRes(now) then
+    recheckEdits(now)
+  end
 end
 
 local function reset()

@@ -202,6 +202,14 @@ For **Original**:
 
 **Full size** and **Original** need the `asset.download` permission.
 
+### Edited photos
+
+Photos cropped, rotated or mirrored in Immich are shown as edited, at every
+image size: the plugin asks for Immich's edited rendition (`edited=true`). For
+**Original**, that's a JPEG, whatever the uploaded file's format. Saved photos
+are re-checked every 6 hours, so an edit made after a photo was saved replaces
+it once it's off screen.
+
 When full size is asked for but Immich only has its preview (typically a
 HEIC photo before Generate full-size image was turned on), the photo is saved
 at preview size and re-fetched every hour until a full-size version exists.
@@ -319,6 +327,8 @@ All requests go only to the configured server.
 
 ## Changelog
 
+- **0.6.0:** show Immich edits (crop, rotate, mirror); re-fetch saved photos
+  edited later.
 - **0.5.0:** re-fetch photos that came back at preview size when full size
   was asked for.
 - **0.4.1:** **HEIC/AVIF originals** setting; HEIC files are removed when it's
