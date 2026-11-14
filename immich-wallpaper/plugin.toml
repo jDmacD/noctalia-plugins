@@ -1,0 +1,233 @@
+id = "jdmacd/immich-wallpaper"
+name = "Immich Wallpaper"
+version = "0.5.0"
+plugin_api = 25
+author = "jdmacd"
+license = "MIT"
+icon = "photo"
+tags = ["wallpaper", "desktop", "service", "lockscreen", "photos"]
+description = "Keeps a wallpaper folder filled with photos from your Immich library, picked ImmichFrame-style by album, people, tag, favorite and memory, for Noctalia's wallpaper rotation and lock screen."
+
+# --- Connection -------------------------------------------------------------
+
+[[setting]]
+key = "server_url"
+type = "string"
+label_key = "settings.server_url.label"
+description_key = "settings.server_url.description"
+default = ""
+
+[[setting]]
+key = "api_key_file"
+type = "file"
+label_key = "settings.api_key_file.label"
+description_key = "settings.api_key_file.description"
+default = ""
+
+[[setting]]
+key = "api_key"
+type = "string"
+label_key = "settings.api_key.label"
+description_key = "settings.api_key.description"
+default = ""
+advanced = true
+
+# --- Image selection (modelled on ImmichFrame's account settings) -----------
+
+[[setting]]
+key = "albums"
+type = "string_list"
+label_key = "settings.albums.label"
+description_key = "settings.albums.description"
+default = []
+
+[[setting]]
+key = "people"
+type = "string_list"
+label_key = "settings.people.label"
+description_key = "settings.people.description"
+default = []
+
+[[setting]]
+key = "tags"
+type = "string_list"
+label_key = "settings.tags.label"
+description_key = "settings.tags.description"
+default = []
+
+[[setting]]
+key = "show_favorites"
+type = "bool"
+label_key = "settings.show_favorites.label"
+description_key = "settings.show_favorites.description"
+default = false
+
+[[setting]]
+key = "show_memories"
+type = "bool"
+label_key = "settings.show_memories.label"
+description_key = "settings.show_memories.description"
+default = false
+
+[[setting]]
+key = "show_on_this_day_memories"
+type = "bool"
+label_key = "settings.show_on_this_day_memories.label"
+default = true
+visible_when = { key = "show_memories", values = ["true"] }
+
+[[setting]]
+key = "show_birthday_memories"
+type = "bool"
+label_key = "settings.show_birthday_memories.label"
+default = true
+visible_when = { key = "show_memories", values = ["true"] }
+
+[[setting]]
+key = "excluded_albums"
+type = "string_list"
+label_key = "settings.excluded_albums.label"
+description_key = "settings.excluded_albums.description"
+default = []
+
+[[setting]]
+key = "images_from_days"
+type = "int"
+label_key = "settings.images_from_days.label"
+description_key = "settings.images_from_days.description"
+default = 0
+min = 0
+max = 36500
+
+[[setting]]
+key = "images_from_date"
+type = "string"
+label_key = "settings.images_from_date.label"
+description_key = "settings.images_from_date.description"
+default = ""
+
+[[setting]]
+key = "images_until_date"
+type = "string"
+label_key = "settings.images_until_date.label"
+description_key = "settings.images_until_date.description"
+default = ""
+
+[[setting]]
+key = "rating"
+type = "int"
+label_key = "settings.rating.label"
+description_key = "settings.rating.description"
+default = 0
+min = 0
+max = 5
+
+[[setting]]
+key = "show_archived"
+type = "bool"
+label_key = "settings.show_archived.label"
+default = false
+
+[[setting]]
+key = "cache_size"
+type = "int"
+label_key = "settings.cache_size.label"
+description_key = "settings.cache_size.description"
+default = 30
+min = 2
+max = 500
+
+# --- Folder sync (Noctalia's own wallpaper automation does the rotating) ----
+
+[[setting]]
+key = "folder"
+type = "folder"
+label_key = "settings.folder.label"
+description_key = "settings.folder.description"
+default = ""
+
+[[setting]]
+key = "churn_minutes"
+type = "int"
+label_key = "settings.churn_minutes.label"
+description_key = "settings.churn_minutes.description"
+default = 30
+min = 1
+max = 1440
+
+[[setting]]
+key = "landscape_only"
+type = "bool"
+label_key = "settings.landscape_only.label"
+description_key = "settings.landscape_only.description"
+default = true
+
+[[setting]]
+key = "image_size"
+type = "select"
+label_key = "settings.image_size.label"
+description_key = "settings.image_size.description"
+default = "preview"
+options = [
+  { value = "preview", label_key = "settings.image_size.options.preview" },
+  { value = "fullsize", label_key = "settings.image_size.options.fullsize" },
+  { value = "original", label_key = "settings.image_size.options.original" },
+]
+
+[[setting]]
+key = "heif_originals"
+type = "bool"
+label_key = "settings.heif_originals.label"
+description_key = "settings.heif_originals.description"
+default = false
+visible_when = { key = "image_size", values = ["original"] }
+
+[[setting]]
+key = "photo_date_format"
+type = "string"
+label_key = "settings.photo_date_format.label"
+description_key = "settings.photo_date_format.description"
+default = "%d %B %Y"
+advanced = true
+
+# --- Entries ----------------------------------------------------------------
+
+[[service]]
+id = "service"
+entry = "service.luau"
+
+[[desktop_widget]]
+id = "caption"
+entry = "caption.luau"
+
+  [[desktop_widget.setting]]
+  key = "show_photo_date"
+  type = "bool"
+  label_key = "settings.show_photo_date.label"
+  default = true
+
+  [[desktop_widget.setting]]
+  key = "show_image_location"
+  type = "bool"
+  label_key = "settings.show_image_location.label"
+  default = true
+
+  [[desktop_widget.setting]]
+  key = "show_people_desc"
+  type = "bool"
+  label_key = "settings.show_people_desc.label"
+  default = true
+
+  [[desktop_widget.setting]]
+  key = "show_image_desc"
+  type = "bool"
+  label_key = "settings.show_image_desc.label"
+  default = true
+
+  [[desktop_widget.setting]]
+  key = "max_width"
+  type = "int"
+  label_key = "settings.max_width.label"
+  default = 360
+  min = 120
+  max = 1200

@@ -1,0 +1,116 @@
+{
+  "notify": {
+    "failed": "Immich Wallpaper"
+  },
+  "settings": {
+    "server_url": {
+      "label": "Immich server URL",
+      "description": "Base URL of your Immich server, e.g. https://photos.example.com (without /api). Requires Immich v3.2 or newer."
+    },
+    "api_key_file": {
+      "label": "API key file",
+      "description": "File containing an Immich API key (read-only permissions are enough: asset.read, asset.view, album.read, person.read, tag.read, memory.read). Preferred over the plain setting below."
+    },
+    "api_key": {
+      "label": "API key",
+      "description": "Immich API key stored in plain text in your Noctalia config. Ignored when an API key file is set."
+    },
+    "albums": {
+      "label": "Albums",
+      "description": "Album names (exact) or IDs to include. Add \":<folder>\" to send matches to another folder, e.g. \"Holidays:~/Pictures/Immich/eDP-1\"."
+    },
+    "people": {
+      "label": "People",
+      "description": "Person names (exact) or IDs to include. Add \":<folder>\" to send matches to another folder, e.g. \"Holidays:~/Pictures/Immich/eDP-1\"."
+    },
+    "tags": {
+      "label": "Tags",
+      "description": "Tag paths to include, e.g. Vacation or Travel/Europe (case-sensitive). Add \":<folder>\" to send matches to another folder, e.g. \"Holidays:~/Pictures/Immich/eDP-1\"."
+    },
+    "show_favorites": {
+      "label": "Include favorites",
+      "description": "Include favorited photos. Albums, people, tags and favorites add up; with none set, the whole library is used."
+    },
+    "show_memories": {
+      "label": "Include memories",
+      "description": "Include today's Immich memories. With no albums, people, tags or favorites set, only memories are shown."
+    },
+    "show_on_this_day_memories": {
+      "label": "On this day memories"
+    },
+    "show_birthday_memories": {
+      "label": "Birthday memories"
+    },
+    "excluded_albums": {
+      "label": "Excluded albums",
+      "description": "Album names (exact) or IDs whose photos are never shown."
+    },
+    "images_from_days": {
+      "label": "Only the last N days",
+      "description": "Only photos taken in the last N days. 0 disables this. Ignored when a start date is set."
+    },
+    "images_from_date": {
+      "label": "Taken on or after",
+      "description": "Only photos taken on or after this date (YYYY-MM-DD)."
+    },
+    "images_until_date": {
+      "label": "Taken on or before",
+      "description": "Only photos taken on or before this date (YYYY-MM-DD)."
+    },
+    "rating": {
+      "label": "Minimum rating",
+      "description": "Only photos with at least this many stars. 0 disables this."
+    },
+    "show_archived": {
+      "label": "Include archived photos"
+    },
+    "cache_size": {
+      "label": "Photos in the folder",
+      "description": "How many Immich photos are kept in each photo folder for Noctalia's rotation to choose from."
+    },
+    "folder": {
+      "label": "Photo folder",
+      "description": "Main photo folder, for entries without a \":<folder>\" suffix, favorites and memories. Empty uses an \"immich\" folder inside your wallpaper folder. Point Settings → Wallpaper at it and turn on Automatic Rotation."
+    },
+    "churn_minutes": {
+      "label": "Swap in a new photo every (minutes)",
+      "description": "Replaces the oldest photo in the folder with a new random one from your selection, so the folder slowly walks through it."
+    },
+    "landscape_only": {
+      "label": "Landscape photos only",
+      "description": "Only save landscape photos. Portrait photos already in a folder are removed once they're off screen."
+    },
+    "photo_date_format": {
+      "label": "Photo date format",
+      "description": "strftime format for the photo date in the caption."
+    },
+    "show_photo_date": {
+      "label": "Show photo date"
+    },
+    "show_image_location": {
+      "label": "Show location"
+    },
+    "show_people_desc": {
+      "label": "Show people"
+    },
+    "show_image_desc": {
+      "label": "Show description"
+    },
+    "max_width": {
+      "label": "Maximum width"
+    },
+    "image_size": {
+      "label": "Image size",
+      "description": "Preview: Immich's generated preview (fast, small; resolution set in Immich's Image Settings). Full size: Immich's full-resolution image. Original: the uploaded file; RAW and other formats Noctalia can't show fall back to full size. Full size and original need the asset.download permission; HEIC/AVIF need libheif.",
+      "options": {
+        "preview": "Preview",
+        "fullsize": "Full size",
+        "original": "Original"
+      }
+    },
+    "heif_originals": {
+      "label": "HEIC/AVIF originals",
+      "description": "Save HEIC, HEIF and AVIF originals as they are. Only turn on if Noctalia can load libheif (its log says \"libheif.so.1 not available\" otherwise); when off, those photos use Immich's full-size JPEG instead."
+    }
+  }
+}

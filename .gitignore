@@ -1,0 +1,6 @@
+# Partial downloads and editor/OS noise
+*.part
+*.swp
+.DS_Store
+__pycache__/
+.claude/
