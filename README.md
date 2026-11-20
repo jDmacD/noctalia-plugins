@@ -5,6 +5,7 @@ Plugins for the [Noctalia](https://github.com/noctalia-dev/noctalia) shell.
 | Plugin | Description |
 | --- | --- |
 | [Immich Wallpaper](immich-wallpaper/) | Keeps wallpaper folders filled with photos from an [Immich](https://immich.app) library, picked ImmichFrame-style by album, people, tag, favorite and memory, for Noctalia's wallpaper rotation and lock screen. |
+| [Nix Overview](nix-overview/) | NixOS at a glance: generation, last switch, closure, store and disk size, whether a reboot is needed, and how far the running system is behind your flake's remote branch. |
 
 ## Installing
 

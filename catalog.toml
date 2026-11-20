@@ -12,3 +12,16 @@ description = "Keeps a wallpaper folder filled with photos from your Immich libr
 deprecated = false
 plugin_api = 25
 tags = ["wallpaper", "desktop", "service", "lockscreen", "photos"]
+
+[[plugin]]
+id = "jdmacd/nix-overview"
+name = "Nix Overview"
+version = "0.1.0"
+author = "jdmacd"
+license = "MIT"
+icon = "snowflake"
+description = "NixOS at a glance: generation, last switch, closure, store and disk size, whether a reboot is needed, and how far the running system is behind your flake's remote branch."
+deprecated = false
+plugin_api = 48
+tags = ["nixos", "bar", "panel", "service", "system", "utility"]
+dependencies = ["nix", "nixos-version", "readlink", "stat", "git"]
