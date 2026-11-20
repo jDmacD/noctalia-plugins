@@ -1,0 +1,130 @@
+id = "jdmacd/nix-overview"
+name = "Nix Overview"
+version = "0.1.0"
+# 48: onResume (sleep callbacks). Also uses argv runAsync (24), require (22),
+# diskStats (16), openSettings (15), panel content height (42).
+plugin_api = 48
+author = "jdmacd"
+license = "MIT"
+icon = "snowflake"
+tags = ["nixos", "bar", "panel", "service", "system", "utility"]
+dependencies = ["nix", "nixos-version", "readlink", "stat", "git"]
+description = "NixOS at a glance: generation, last switch, closure, store and disk size, whether a reboot is needed, and how far the running system is behind your flake's remote branch."
+
+# --- Config check -------------------------------------------------------------
+
+[[setting]]
+key = "flake_dir"
+type = "folder"
+label_key = "settings.flake_dir.label"
+description_key = "settings.flake_dir.description"
+default = ""
+
+[[setting]]
+key = "remote_ref"
+type = "string"
+label_key = "settings.remote_ref.label"
+description_key = "settings.remote_ref.description"
+default = "origin/main"
+
+[[setting]]
+key = "watch_paths"
+type = "string_list"
+label_key = "settings.watch_paths.label"
+description_key = "settings.watch_paths.description"
+default = []
+advanced = true
+
+[[setting]]
+key = "fetch_minutes"
+type = "int"
+label_key = "settings.fetch_minutes.label"
+description_key = "settings.fetch_minutes.description"
+default = 30
+min = 0
+max = 1440
+
+# --- Store and disk -----------------------------------------------------------
+
+[[setting]]
+key = "store_check_hours"
+type = "int"
+label_key = "settings.store_check_hours.label"
+description_key = "settings.store_check_hours.description"
+default = 24
+min = 0
+max = 168
+
+[[setting]]
+key = "low_disk_gib"
+type = "int"
+label_key = "settings.low_disk_gib.label"
+description_key = "settings.low_disk_gib.description"
+default = 10
+min = 0
+max = 1000
+
+# --- Panel commands -----------------------------------------------------------
+
+[[setting]]
+key = "update_command"
+type = "string"
+label_key = "settings.update_command.label"
+description_key = "settings.update_command.description"
+default = ""
+
+[[setting]]
+key = "clean_command"
+type = "string"
+label_key = "settings.clean_command.label"
+description_key = "settings.clean_command.description"
+default = "nh clean all"
+
+[[setting]]
+key = "optimise_command"
+type = "string"
+label_key = "settings.optimise_command.label"
+description_key = "settings.optimise_command.description"
+default = ""
+advanced = true
+
+[[setting]]
+key = "keep_terminal_open"
+type = "bool"
+label_key = "settings.keep_terminal_open.label"
+description_key = "settings.keep_terminal_open.description"
+default = true
+advanced = true
+
+# --- Entries ------------------------------------------------------------------
+
+[[service]]
+id = "service"
+entry = "service.luau"
+
+[[widget]]
+id = "status"
+entry = "widget.luau"
+
+  [[widget.setting]]
+  key = "text_format"
+  type = "string"
+  label_key = "settings.text_format.label"
+  description_key = "settings.text_format.description"
+  default = "{generation} · {disk_free}"
+
+  [[widget.setting]]
+  key = "show_markers"
+  type = "bool"
+  label_key = "settings.show_markers.label"
+  description_key = "settings.show_markers.description"
+  default = true
+
+[[panel]]
+id = "panel"
+entry = "panel.luau"
+placement = "attached"
+open_near_click = true
+width = 440
+height = "content"
+max_height = 680
